@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset=utf-8 />
+  <title>Animating flight paths</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.css' rel='stylesheet' />
+  <style>
+  body { margin:0; padding:0; }
+  #map { position:absolute; top:0; bottom:0; width:100%; }
+  </style>
+</head>
+<body>
+  <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/arc.js/v0.1.0/arc.js'></script>
+
+  <style>
+  .path-start {
+    -webkit-transition:stroke-dashoffset 5s ease-in;
+    -moz-transition:stroke-dashoffset 5s ease-in;
+    -o-transition:stroke-dashoffset 5s ease-in;
+    transition:stroke-dashoffset 5s ease-in;
+  }
+  </style>
+
+  <div id='map' class='dark'></div>
+
+  <script>
+  L.mapbox.accessToken = 'pk.eyJ1Ijoia3ppZWwiLCJhIjoiaVROWDVNcyJ9.hxCBMTpnmZjG8X_03FYMBg';
+  var map = L.mapbox.map('map', 'kziel.l04pnpnd', {
+    attributionControl: false,
+    infoControl: true
+  })
+  .setView([20, 0], 2);
+  map.dragging.disable();
+  map.touchZoom.disable();
+  map.doubleClickZoom.disable();
+  map.scrollWheelZoom.disable();
+  if (map.tap) map.tap.disable();
+  function obj(ll) { return { y: ll[0], x: ll[1] }; }
+  for (var i = 0; i < 1; i++) {
+    var generator = new arc.GreatCircle(
+      obj([40.6397, -73.7789]),
+      obj([50.1166667, 8.6833333]));
+    var line = generator.Arc(100, { offset: 10 });
+    var newLine = L.polyline(line.geometries[0].coords.map(function(c) {
+      return c.reverse();
+    }), {
+      color: '#fff',
+      weight: 2,
+      opacity: 1
+    })
+    .addTo(map);
+    var totalLength = newLine._path.getTotalLength();
+    newLine._path.classList.add('path-start');
+    newLine._path.style.strokeDashoffset = totalLength;
+    newLine._path.style.strokeDasharray = totalLength;
+    setTimeout((function(path) {
+      return function() {
+        path.style.strokeDashoffset = 0;
+      };
+    })(newLine._path), i * 100);
+    setTimeout(function(){
+      map.dragging.enable();
+      map.touchZoom.enable();
+      map.doubleClickZoom.enable();
+      map.scrollWheelZoom.enable();
+    },5000)
+  }
+</script>
+</body>
+</html>
