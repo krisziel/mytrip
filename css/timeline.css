@@ -1,0 +1,50 @@
+#timeline {
+  width: 100%;
+  height: 25px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  background: #ff0000;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+#timeline > .tweet {
+  width: 5px;
+  height: 100%;
+  background: #00ff00;
+  position: absolute;
+  top: 0px;
+}
+.popup-container {
+  width: 300px;
+  height: auto;
+  position: absolute;
+  z-index: 1002;
+  color: rgba(0, 0, 0, 0.74902);
+  top: 21px;
+}
+.popup-container > .leaflet-popup-tip-container {
+  margin-bottom: -7px;
+  -webkit-transform: rotate(90deg);
+}
+.popup-body {
+  padding: 10px;
+  background: #ffffff;
+  border-radius: 4px;
+}
+.popup-container a {
+  text-decoration: none;
+  font-weight: normal;
+  color: #3887BE;
+}
+.popup-container h2 {
+  font-size: 15px;
+  line-height: 20px;
+  margin: 0 0 10px;
+}
+.popup-container p {
+  font-size: 15px;
+  line-height: 20px;
+  margin: 0 0 10px;
+}
