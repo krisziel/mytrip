@@ -12,33 +12,10 @@
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
     <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/arc.js/v0.1.0/arc.js'></script>
     <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
-    <script src='https://www.mapbox.com/mapbox.js/assets/data/flights.js'></script>
   </head>
   <body>
     <div id="map">
-
     </div>
-    <ul class="timeline">
-    </ul>
-    <div class="popup">
-      <flight>United 976</flight>
-      <equipment>777 (N784UA)</equipment>
-      <origin title="Washington Dulles International">
-        <airport tooltip="Washington Dulles International">IAD</airport>
-        <sched><time>10:15PM</time> <small>Scheduled</small></sched>
-        <actual><time>10:10PM</time> <small>Actual</small></actual>
-      </origin>
-      <destination title="Dubai Airport">
-        <airport tooltip="Dubai Airport">DXB</airport>
-        <sched><time>8:15PM (+1)</time> <small>Scheduled</small></sched>
-        <actual><time>8:00PM (+1)</time> <small>Estimated</small></actual>
-      </destination>
-      <ul class="flightLength">
-        <div class="flightLine"></div>
-        <li class="elapsed">5:50</li>
-        <li class="remaining">8:10</li>
-        <li class="statusPlane" style="left: 100px;"></li>
-      </ul>
-    </div>
+    <div class="overlay"></div>
   </body>
 </html>

@@ -21,7 +21,7 @@ var data = [
     "airline": "SQ",
     "flight": "25",
     "date": "1/21/2015",
-    "seat": "4A",
+    "seat": "2A",
     "class": "Suites"
   }
 },
@@ -37,8 +37,8 @@ var data = [
   },
   "destination": {
     "coordinates": [
-    50.1166667,
-    8.6833333
+    1.3592,
+    103.9894
     ],
     "name": "Singapore Changi Airport",
     "code": "SIN"
@@ -47,7 +47,33 @@ var data = [
     "airline": "SQ",
     "flight": "25",
     "date": "1/22/2015",
-    "seat": "4A",
+    "seat": "2A",
+    "class": "Suites"
+  }
+},
+{
+  "type": "flight",
+  "origin": {
+    "coordinates": [
+    1.3592,
+    103.9894
+    ],
+    "name": "Singapore Changi Airport",
+    "code": "SIN"
+  },
+  "destination": {
+    "coordinates": [
+      22.3089,
+      113.9144
+    ],
+    "name": "Hong Kong International Airport",
+    "code": "HKG"
+  },
+  "info": {
+    "airline": "SQ",
+    "flight": "25",
+    "date": "1/23/2015",
+    "seat": "3A",
     "class": "Suites"
   }
 },
@@ -56,8 +82,8 @@ var data = [
   "date": "1/25/2015",
   "origin": {
     "coordinates": [
-    22.2887313,
-    114.0782909
+      22.2893086,
+      114.1527226
     ],
     "name": "Hong Kong - Macau Ferry Terminal"
   },
@@ -70,7 +96,7 @@ var data = [
   }
 },
 {
-  "type": "hotel",
+  "type": "lodging",
   "coordinates": [
   22.1420284,
   113.5694877
@@ -80,5 +106,19 @@ var data = [
   "1/25/2015",
   "1/26/2015"
   ]
+},
+{
+  "type":"ferry",
+  "date":[
+  "1/26/2015"
+  ],
+  "origin":{
+    "coordinates":[22.1981129,113.5606913],
+    "name":"Outer Macau Ferry Terminal"
+  },
+  "destination":{
+    "coordinates":[22.3176268,113.9442349],
+    "name":"SkyPier at HKIA"
+  }
 }
 ]

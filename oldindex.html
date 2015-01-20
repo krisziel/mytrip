@@ -3,32 +3,18 @@
   <head>
     <meta charset="UTF-8">
     <title>My Status</title>
-    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/viewer.css">
     <script src="js/jquery.min.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/viewer.js"></script>
   </head>
   <body>
-    <ul class="timeline">
-    </ul>
-    <div class="popup">
-      <flight>United 976</flight>
-      <equipment>777 (N784UA)</equipment>
-      <origin title="Washington Dulles International">
-        <airport tooltip="Washington Dulles International">IAD</airport>
-        <sched><time>10:15PM</time> <small>Scheduled</small></sched>
-        <actual><time>10:10PM</time> <small>Actual</small></actual>
-      </origin>
-      <destination title="Dubai Airport">
-        <airport tooltip="Dubai Airport">DXB</airport>
-        <sched><time>8:15PM (+1)</time> <small>Scheduled</small></sched>
-        <actual><time>8:00PM (+1)</time> <small>Estimated</small></actual>
-      </destination>
-      <ul class="flightLength">
-        <div class="flightLine"></div>
-        <li class="elapsed">5:50</li>
-        <li class="remaining">8:10</li>
-        <li class="statusPlane" style="left: 100px;"></li>
-      </ul>
+    <div id="viewer">
+      <div class="window" data-images="4">
+        <div class="image" style="background:url(https://pbs.twimg.com/media/B7yKhELCMAEDmWC.png);"></div>
+        <div class="image" style="background:url(https://pbs.twimg.com/media/B7yKhDrCAAEahnY.png);"></div>
+        <div class="image" style="background:url(https://pbs.twimg.com/media/B7yKhDKCYAArVjj.png);"></div>
+        <div class="image" style="background:url(https://pbs.twimg.com/media/B7yKhCtCMAARLmP.png);"></div>
+      </div>
     </div>
   </body>
 </html>

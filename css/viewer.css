@@ -1,0 +1,27 @@
+* {
+  box-sizing: border-box;
+  font-family: 'Helvetica Neue', Helvetica;
+}
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+#viewer {
+  width: 300px;
+  height: auto;
+  background: #ff0000;
+}
+#viewer > .window {
+  width: 100%;
+}
+#viewer > .window > .image {
+  width: 100%;
+  float: left;
+}
+.window[data-images="4"] .image {
+  width: 145px !important;
+  height: 100px;
+  background-size: 145px 100px;
+}
