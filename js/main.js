@@ -129,7 +129,7 @@ function addMarker(args) {
   }
 }
 function getTweets() {
-  $.getJSON("http://kziel.herokuapp.com/kziel?count=1&since_id=10&exclude_replies=false",function(data){
+  $.getJSON("http://kziel.herokuapp.com/kziel?count=3&since_id=10&exclude_replies=false",function(data){
     $.each(data,function(i,tweet){
       parseTweet(tweet);
     });
@@ -167,28 +167,33 @@ function addTweetMarker(data) {
     var content = '<h2><a href="http://twitter.com/' + data.user.screen_name + '">@' + data.user.screen_name + '</a> (' + data.user.name + ')<\/h2>';
     content += '<p>' + parseTweetLinks(data) + '</p>';
     content += '<p><a href="http://twitter.com/' + data.user.screen_name + '/status/' + data.id_str + '">' + timeMachine(data.created_at) + '</a></p>';
-    if(data.extended_entities.media) {
+    if((data.extended_entities)&&(data.extended_entities.media)) {
       var imagesLength = data.extended_entities.media.length;
       var imgMultiplier = 1
       if(imagesLength == 1) {
         imgMultiplier = 2.0357;
       }
-      content += '<div class="gallery" data-images="' + imagesLength + '">';
-        $.each(data.extended_entities.media,function(i,media){
-          size = media.sizes.large;
-          if((size.h*2)>size.w) {
-            imgWidth = 140;
-            imgHeight = (size.h*(140/size.w));
-            imgTop = -((imgHeight-70)/2);
-            imgLeft = 0;
-          } else {
-            imgWidth = (size.w*(70/size.h));
-            imgHeight = 70;
-            imgTop = 0;
-            imgLeft = -((imgWidth-140)/2);
-          }
-          content += '<div class="tweet-image" data-tweetid="' + data.id + '" data-imagesrc="' + media.media_url + '"><img src="' + media.media_url + '" id="image' + media.id + '" style="width:' + imgWidth*imgMultiplier + 'px;height:' + imgHeight*imgMultiplier + 'px;margin-top:' + imgTop*imgMultiplier + 'px;margin-left:' + imgLeft*imgMultiplier + 'px;" data-imageid="' + media.id + '" /></div>';
-        });
+      var entities_array = data.extended_entities.media
+      var imageGrid = '';
+      var dataUrls = [];
+      $.each(data.extended_entities.media,function(i,media){
+        size = media.sizes.large;
+        if((size.h*2)>size.w) {
+          imgWidth = 140;
+          imgHeight = (size.h*(140/size.w));
+          imgTop = -((imgHeight-70)/2);
+          imgLeft = 0;
+        } else {
+          imgWidth = (size.w*(70/size.h));
+          imgHeight = 70;
+          imgTop = 0;
+          imgLeft = -((imgWidth-140)/2);
+        }
+        dataUrls.push(media.media_url);
+        imageGrid += '<div class="tweet-image" data-tweetid="' + data.id + '" data-imagesrc="' + media.media_url + '"><img src="' + media.media_url + '" id="image' + media.id + '" style="width:' + imgWidth*imgMultiplier + 'px;height:' + imgHeight*imgMultiplier + 'px;margin-top:' + imgTop*imgMultiplier + 'px;margin-left:' + imgLeft*imgMultiplier + 'px;" data-imageid="' + media.id + '" /></div>';
+      });
+      content += '<div class="gallery" data-images="' + imagesLength + '" data-imageurls="' + dataUrls.join('\\\/\\\/\\\/') + '">';
+      content += imageGrid;
       content += '</div>';
     }
     layer.bindPopup(content);
@@ -202,11 +207,13 @@ function addTweetMarker(data) {
 function parseTweetLinks(tweet) {
   var text = tweet.text;
   var html = text;
-  $.each(tweet.entities.media,function(i,entity){
-    var newText = text.slice(entity.indices[0],entity.indices[1]);
-    var newHtml = '<a href="' + entity.expanded_url + '" title="' + entity.expanded_url + '">' + newText + '</a>';
-    html = html.replace(newText,newHtml);
-  });
+  if(tweet.entities.media) {
+    $.each(tweet.entities.media,function(i,entity){
+      var newText = text.slice(entity.indices[0],entity.indices[1]);
+      var newHtml = '<a target="_blank" href="' + entity.expanded_url + '" title="' + entity.expanded_url + '">' + newText + '</a>';
+      html = html.replace(newText,newHtml);
+    });
+  }
   return html;
 }
 function centerPolygon(polygon) {
@@ -222,16 +229,84 @@ function centerPolygon(polygon) {
 function imageLightbox(image) {
   $('.overlay').css({height:$(window).height(),width:$(window).width(),display:'block'});
   setTimeout(function(){ $('.overlay').css({opacity:1}); },1);
-  $('.overlay').html('<img src="' + image + '">');
+  var newImage = new Image();
+  newImage.src = image;
+  imgHeight = newImage.height;
+  imgWidth = newImage.width;
+  imgTop = -(imgHeight/2);
+  imgLeft = -(imgWidth/2);
+  $('.overlay').html('<img src="' + image + '" style="width:' + imgWidth + 'px;height:' + imgHeight + 'px;margin-top:' + imgTop + 'px;margin-left:' + imgLeft + 'px;">');
+  var leftArrow = $('<div>',{
+    style:'margin-left:' + (imgLeft-40) + 'px',
+    id:'leftArrow',
+    class:'Icon arrow'
+  });
+  leftArrow.bind('click',function(){
+    navigateLightbox('left');
+  });
+  var rightArrow = $('<div>',{
+    style:'margin-left:' + (-imgLeft+10) + 'px',
+    id:'rightArrow',
+    class:'Icon arrow'
+  });
+  rightArrow.bind('click',function(){
+    navigateLightbox('right');
+  });
+  var close = $('<div>',{
+    id:'closeLightbox',
+    class:'Icon close'
+  });
+  close.bind('click',function(){
+    closeLightbox();
+  });
+  var images = $('.gallery').attr('data-imageurls').split('\\\/\\\/\\\/');
+  if(images.length > 1) {
+    $('.overlay').append(leftArrow);
+    $('.overlay').append(rightArrow);
+  }
+  $('.overlay').append(close);
+  $(window).bind('keydown',function(e){
+    lightboxKeyCode(e.keyCode);
+  });
+}
+function lightboxKeyCode(keyCode) {
+  if(keyCode === 27) {
+    closeLightbox();
+  } else if(keyCode === 39) {
+    navigateLightbox('right');
+  } else if (keyCode === 37) {
+    navigateLightbox('left');
+  }
+}
+function navigateLightbox(direction) {
+  var images = $('.gallery').attr('data-imageurls').split('\\\/\\\/\\\/');
+  var currentIndex = images.indexOf($('.overlay img').attr("src"));
+  console.log(currentIndex);
+  var newImage = '';
+  if(direction === 'right') {
+    if(images[currentIndex+1]) {
+      newImage = images[currentIndex+1];
+    } else {
+      newImage = images[0];
+    }
+  } else if(direction === 'left') {
+    if(images[currentIndex-1]) {
+      newImage = images[currentIndex-1];
+    } else {
+      newImage = images[images.length-1];
+    }
+  }
+  imageLightbox(newImage);
+  // $('.overlay img').attr("src",newImage);
 }
 function closeLightbox() {
   $('.overlay').css({opacity:0});
-  setTimeout(function(){ $('.overlay').css({display:'block'}); },300);
+  setTimeout(function(){ $('.overlay').css({display:'none'}); },300);
+  $(window).unbind('keydown');
 }
 function timeMachine(date) {
   return date;
   var date = new Date(date);
-
 }
 
 function obj(ll) { return { y: ll[0], x: ll[1] }; }
