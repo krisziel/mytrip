@@ -3,6 +3,33 @@ var data = [
   "type": "flight",
   "origin": {
     "coordinates": [
+    37.615215,
+    -122.389881
+    ],
+    "name": "San Francisco International Airport",
+    "code": "SFO"
+  },
+  "destination": {
+    "coordinates": [
+    40.6397,
+    -73.7789
+    ],
+    "name": "John F Kennedy International Airport",
+    "code": "JFK"
+  },
+  "info": {
+    "airline": "UA",
+    "flight": "758",
+    "date": "1/21/2015",
+    "seat": "3F",
+    "class": "BusinessFirst"
+  },
+  "id":"sfojfk"
+},
+{
+  "type": "flight",
+  "origin": {
+    "coordinates": [
     40.6397,
     -73.7789
     ],
@@ -79,6 +106,33 @@ var data = [
     "class": "Suites"
   },
   "id":"sinhkg"
+},
+{
+  "type": "flight",
+  "origin": {
+    "coordinates": [
+    22.315248,
+    113.93649
+    ],
+    "name": "Hong Kong International Airport",
+    "code": "HKG"
+  },
+  "destination": {
+    "coordinates": [
+    37.615215,
+    -122.389881
+    ],
+    "name": "San Francisco International Airport",
+    "code": "SFO"
+  },
+  "info": {
+    "airline": "UA",
+    "flight": "862",
+    "date": "1/26/2015",
+    "seat": "1A",
+    "class": "Global First"
+  },
+  "id":"hkgsfo"
 },
 {
   "type": "ferry",

@@ -177,6 +177,7 @@ function addTweetMarker(data) {
   });
   $('.leaflet-popup-pane').bind('DOMSubtreeModified',function(){
     $('.popup-container').remove();
+    $('.tweet.selected').removeClass('selected');
     $('.tweet-image').bind('click',function(){
       imageLightbox($(this).attr('data-imagesrc'));
     })

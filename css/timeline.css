@@ -4,17 +4,40 @@
   position: absolute;
   left: 0px;
   top: 0px;
-  background: #ff0000;
+  background: #000000;
   margin: 0;
   padding: 0;
   list-style: none;
 }
+#timeline > .now {
+  width: 2px;
+  background: #ff0000;
+  z-index: 1003;
+}
 #timeline > .tweet {
-  width: 5px;
-  height: 100%;
+  width: 3px;
   background: #00ff00;
+  z-index: 998;
+}
+#timeline > .flight {
+  background: #00ff00;
+  z-index: 997;
+}
+#timeline > .ferry {
+  background: #ff0000;
+  z-index: 996;
+}
+#timeline > .hotel {
+  background: #0000ff;
+  z-index: 995;
+}
+#timeline > li {
   position: absolute;
   top: 0px;
+  height: 100%;
+}
+#timeline > li.selected {
+  background: #ffffff !important;
 }
 .popup-container {
   width: 300px;
@@ -47,4 +70,15 @@
   font-size: 15px;
   line-height: 20px;
   margin: 0 0 10px;
+}
+.popup-container .close {
+  top: 18px;
+  right: 8px;
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  color: #000000;
+}
+.popup-container .close:before {
+  content: "\f045";
 }
