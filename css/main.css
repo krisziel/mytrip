@@ -158,3 +158,61 @@ body {
   transition: opacity .75s ease-in;
   color: #FFFFFF;
 }
+#tweetsLoading {
+  position: absolute;
+  left: 50%;
+  margin-left: -84px;
+  top: 35px;
+  width: 168px;
+  padding-top: 7px;
+  padding-left: 38px;
+  line-height: 24px;
+  text-align: left;
+  height: 38px;
+  background: #000000 url(../images/loading.gif) no-repeat 7px 7px;
+  background-size: 24px 24px;
+  -webkit-border-radius: 19px;
+  z-index: 1003;
+  display: block;
+  opacity: 0;
+  -webkit-transition: all .5s ease-in;
+  -moz-transition: all .5s ease-in;
+  -o-transition: all .5s ease-in;
+  transition: all .5s ease-in;
+  color: #FFFFFF;
+}
+#tweetsLoading.usage {
+  width: 306px;
+  margin-left: -153px;
+  background: #000000;
+  padding: 7px 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  height: 86px;
+  text-align: center;
+  -webkit-animation: FadeOut 1s 5s 1; /* Safari 4+ */
+  -moz-animation:    FadeOut 1s 5s 1; /* Fx 5+ */
+  -o-animation:      FadeOut 1s 5s 1; /* Opera 12+ */
+  animation:         FadeOut 1s 5s 1;
+}
+
+@-webkit-keyframes FadeOut {
+  0%   { opacity: 1; }
+  80% { opacity: 0; display: none; }
+  100% { opacity: 0; display: none; }
+}
+@-moz-keyframes FadeOut {
+  0%   { opacity: 1; }
+  80% { opacity: 0; display: none; }
+  100% { opacity: 0; display: none; }
+}
+@-o-keyframes FadeOut {
+  0%   { opacity: 1; }
+  80% { opacity: 0; display: none; }
+  100% { opacity: 0; display: none; }
+}
+@keyframes FadeOut {
+  0%   { opacity: 1; }
+  80% { opacity: 0; display: none; }
+  100% { opacity: 0; display: none; }
+}

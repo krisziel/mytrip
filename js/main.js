@@ -166,8 +166,9 @@ function easyDate(date) {
   return months[date.getMonth()] + ' ' + date.getDate();
 }
 function getTweets() {
+  $('#tweetsLoading').css({opacity:1});
   $.ajax({
-    url: 'http://kziel.herokuapp.com/kziel?count=10&since_id=10&exclude_replies=false',
+    url: 'http://kziel.herokuapp.com/kziel?count=200&since_id=557472755302821887&exclude_replies=false',
     type: 'GET',
     dataType: 'jsonp'
   });
@@ -180,6 +181,10 @@ function twitterData(data) {
   $.each(data,function(i,tweet){
     parseTweet(tweet);
   });
+  setTimeout(function(){
+    $('#tweetsLoading').addClass('usage').html('Click a flight in the timeline to show info<br />Click a blue line to show that tweet<br />Click any marker on the map for info');
+    setTimeout(function(){ $('#tweetsLoading').remove(); },6000)
+  },500);
 }
 var tweetCoords = false;
 function parseTweet(tweet) {
