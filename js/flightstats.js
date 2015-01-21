@@ -1,5 +1,10 @@
 var flightArray = [];
 var flightObject = {};
+var airportObject = {};
+var airlineObject = {};
+var aircraftObject = {};
+var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
 function selectFlights(){
   $.each(data,function(i,segment){
     if(segment.type === "flight") {
@@ -25,11 +30,11 @@ function downloadData() {
     var urlDate = flight.getFullYear() + '/' + (parseInt(flight.getMonth())+1) + '/' + flight.getDate();
     params = { origin: value.origin };
     if(flight <= range) {
-      var uri = '/flex/flightstatus/rest/v2/json/flight/status/' + value.carrier + '/' + value.flight + '/dep/' + urlDate;
+      var uri = '/flex/flightstatus/rest/v2/jsonp/flight/status/' + value.carrier + '/' + value.flight + '/dep/' + urlDate;
     } else {
-      var uri = '/flex/schedules/rest/v1/json/flight/' + value.carrier + '/' + value.flight + '/departing/' + urlDate;
+      var uri = '/flex/schedules/rest/v1/jsonp/flight/' + value.carrier + '/' + value.flight + '/departing/' + urlDate;
     }
-    flightStatsData({uri:uri,i:i,params:params});
+    flightStatsData({uri:uri,i:i,params:params,vitals:value});
   });
 }
 function flightStatsData(args) {
@@ -46,11 +51,10 @@ function flightStatsData(args) {
   $.ajax({
     url: 'https://api.flightstats.com' + uri + '?appId=8e45847d&appKey=c57485c1d166d52b3281f836b3d07ceb&airport=' + params.origin,
     type: 'GET',
-    crossDomain: true,
-    success: function(data) {
-      processFlightData({data:data,params:params});
-    },
-    error: function() {
+    dataType: 'jsonp',
+    context: this,
+    success: function (data) {
+      processFlightData({data:data,params:params,vitals:args.vitals});
     }
   });
 }
@@ -71,6 +75,15 @@ function processFlightData(args) {
       return false;
     }
   });
+  $.each(data.appendix.airlines,function(i,airline){
+    airlineObject[airline.fs] = airline;
+  });
+  $.each(data.appendix.airports,function(i,airport){
+    airportObject[airport.fs] = airport;
+  });
+  $.each(data.appendix.equipments,function(i,equipment){
+    aircraftObject[equipment.iata] = equipment;
+  });
   if(data.scheduledFlights) {
     var sched = data.scheduledFlights;
     if(sched.length > 1) {
@@ -84,6 +97,25 @@ function processFlightData(args) {
     }
     departure = thisFlight.departureTime;
     arrival = thisFlight.arrivalTime;
+    thisFlight.operationalTimes = {
+      scheduledGateDeparture: {
+        dateUtc:departure,
+      },
+      scheduledGateArrival: {
+        dateUtc:arrival
+      }
+    }
+
+    thisFlight.flightEquipment = {
+      scheduledEquipmentIataCode: thisFlight.flightEquipmentIataCode
+    }
+    var flightStart = new Date(departure).getTime();
+    var flightEnd = new Date(arrival).getTime();
+    flightStart -= (60*60*1000*airportObject[thisFlight.departureAirportFsCode].utcOffsetHours);
+    flightEnd -= (60*60*1000*airportObject[thisFlight.arrivalAirportFsCode].utcOffsetHours);
+    thisFlight.operationalTimes.scheduledGateDeparture.dateUtc = flightStart;
+    thisFlight.operationalTimes.scheduledGateArrival.dateUtc = flightEnd;
+    var flightId = thisFlight.carrierFsCode + "" + thisFlight.flightNumber;
   } else if(data.flightStatuses) {
     var status = data.flightStatuses;
     if(status.length > 1) {
@@ -102,31 +134,29 @@ function processFlightData(args) {
     departure = departure.dateUtc;
     var flightStart = new Date(departure).getTime();
     var flightEnd = new Date(arrival).getTime();
-    var left = ((flightStart-start)/mspp);
-    var width = ((flightEnd-flightStart)/mspp);
-    var thisFlightBlock = $('<li>',{
-      id:'flight' + flightId,
-      class:'flight',
-      style:'left:' + left + 'px;width:' + width + 'px;'
-    });
-    thisFlightBlock.attr('data-flightid',flightId);
-    thisFlightBlock.bind('click',function(){
-      openFlight($(this).attr('data-flightid'));
-    });
-    $('#timeline').append(thisFlightBlock);
-    flightObject[flightId] = thisFlight;
   }
+  var left = ((flightStart-start)/mspp);
+  var width = ((flightEnd-flightStart)/mspp);
+  var thisFlightBlock = $('<li>',{
+    id:'flight' + flightId,
+    class:'flight',
+    style:'left:' + left + 'px;width:' + width + 'px;'
+  });
+  thisFlightBlock.attr('data-flightid',flightId);
+  thisFlightBlock.bind('click',function(){
+    openFlight($(this).attr('data-flightid'));
+  });
+  $('#timeline').append(thisFlightBlock);
+  flightObject[flightId] = thisFlight;
+  flightObject[flightId].vitals = args.vitals;
 }
 function openFlight(id) {
-  console.log(id);
-  // $('.tweet.selected').removeClass('selected');
-  // $('#tt' + id).addClass('selected');
   data = flightObject[id];
   globalMap.closePopup();
   if($('.popup-container').length > 0) {
     $('.popup-container').remove();
   }
-  var timelineLeft = $('#flight' + id).position().left;
+  var timelineLeft = ($('#flight' + id).position().left+($('#flight' + id).width()/2));
   if((timelineLeft-160) <= 10) {
     var paneLeft = 10;
     var tipLeft = (timelineLeft-167);
@@ -134,14 +164,21 @@ function openFlight(id) {
     var paneLeft = (timelineLeft-157);
     var tipLeft = 0;
   }
+  var departure = new Date(data.operationalTimes.scheduledGateDeparture.dateUtc).getTime();
+  var arrival = new Date(data.operationalTimes.scheduledGateArrival.dateUtc).getTime();
+  departure += (60*60*1000*airportObject[data.departureAirportFsCode].utcOffsetHours);
+  arrival += (60*60*1000*airportObject[data.arrivalAirportFsCode].utcOffsetHours);
+  departure = new Date(departure);
+  arrival = new Date(arrival);
   var pane = '<div class="popup-container" style="left:' + paneLeft + 'px;">';
   pane += '<div class="leaflet-popup-tip-container" style="left:' + tipLeft + 'px;"><div class="leaflet-popup-tip"></div></div>';
   pane += '<div class="popup-body">';
   pane += '<div class="close Icon" id="close-popup"></div>';
-  var content = '<h2>' + data.carrierFsCode + data.flightNumber + ' ' + data.departureAirportFsCode + '-' + data.arrivalAirportFsCode + '<\/h2>';
-  // content += '<p>' + parseTweetLinks(data) + '</p>';
-  // content += '<p><a href="http://twitter.com/' + data.user.screen_name + '/status/' + data.id_str + '" target="_blank">' + timeMachine(data.created_at) + '</a></p>';
-  // content += imageGrid(data);
+  var content = '<h2>' + airlineObject[data.carrierFsCode].name + ' ' + data.flightNumber + ' ' + data.departureAirportFsCode + '-' + data.arrivalAirportFsCode + '<\/h2>';
+  content += '<p>Seat ' + data.vitals.seat + ' (' + data.vitals.class + ')</p>';
+  content += '<p>Depart ' + data.departureAirportFsCode + ' on ' + dateTime(departure) + '</p>';
+  content += '<p>Arrive ' + data.arrivalAirportFsCode + ' on ' + dateTime(arrival) + '</p>';
+  content += '<p style="font-size: 12px;">' + aircraftObject[parseInt(data.flightEquipment.scheduledEquipmentIataCode)].name + '</p>';
   pane += content;
   pane += '</div>';
   pane += '</div>';
@@ -150,11 +187,20 @@ function openFlight(id) {
     closePopup();
   });
 }
+
+function dateTime(date) {
+  dateString = months[date.getUTCMonth()];
+  dateString += ' ';
+  dateString += date.getUTCDate();
+  dateString += ' at ';
+  dateString += makeTime(date);
+  return dateString;
+}
 function makeTime(time) {
-  time.getHours() > 12 ? hours = (time.getHours() - 12) : hours = time.getHours();
-  minutes = "0" + time.getMinutes();
+  time.getUTCHours() > 12 ? hours = (time.getUTCHours() - 12) : hours = time.getUTCHours();
+  minutes = "0" + time.getUTCMinutes();
   minutes = minutes.substr(-2,2);
-  if(time.getHours() > 11) {
+  if(time.getUTCHours() > 11) {
     time = hours + ":" + minutes + " PM";
   } else {
     hours == 1 ? hours = 12 : hours = hours;

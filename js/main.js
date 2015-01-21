@@ -80,13 +80,17 @@ function drawFerry(data) {
     newLine._path.classList.add('path-start');
     newLine._path.style.strokeDashoffset = totalLength;
     newLine._path.style.strokeDasharray = totalLength;
-    addMarker({data:data.origin,coordinates:data.origin.coordinates,symbol:'ferry'});
+    data.od = "origin"
+    addMarker({data:data,marker:data.origin,coordinates:data.origin.coordinates,symbol:'ferry'});
     setTimeout(function(){
-      addMarker({data:data.destination,coordinates:data.destination.coordinates,symbol:'ferry',markerId:data.id});
-    },1000);
+      data.od = "destination"
+      addMarker({data:data,marker:data.destination,coordinates:data.destination.coordinates,symbol:'ferry',markerId:data.id});
+    },100);
+    timelineFerry(data);
 }
 function drawLodging(data) {
   addMarker({symbol:'lodging',data:data,coordinates:data.coordinates,markerId:data.id});
+  timelineHotel(data);
 }
 function addMarker(args) {
   if(!args) {
@@ -100,7 +104,8 @@ function addMarker(args) {
         title:args.markerId,
         'marker-color': args.color || '#548cba',
         'marker-size': args.size || 'large',
-        'marker-symbol': args.symbol
+        'marker-symbol': args.symbol,
+        title:args.symbol + args.data.id
       },
       geometry: {
         type: 'Point',
@@ -108,34 +113,57 @@ function addMarker(args) {
       },
     }]
   }).addTo(globalMap);
+  var utcOffset = 8; // ummmmmm
+  var utcOffset = 0;
   if(args.symbol) {
     if(args.symbol == 'airport') {
       featureLayer.eachLayer(function(layer) {
-        var content = '<h2>' + args.data.name + '<\/h2>'
+        var content = '<h2>' + args.data.name + '<\/h2>';
         layer.bindPopup(content);
       });
     } else if (args.symbol == 'ferry') {
       featureLayer.eachLayer(function(layer) {
-        var content = '<h2>' + args.data.name + '<\/h2>'
+        var content = '<h2>' + args.marker.name + '<\/h2>';
+        if(args.data.od == "origin") {
+          content += '<p>Bound for ' + args.data.destination.name + '</p>';
+        } else {
+          content += '<p>Arriving from ' + args.data.origin.name + '</p>';
+        }
+        content += '<p>' + makeTime(localize(args.data.date[0],utcOffset)) + '-' + makeTime(localize(args.data.date[1],utcOffset)) + ' on ' + easyDate(args.data.date[0]) + '</p>';
         layer.bindPopup(content);
       });
     } else if(args.symbol == 'lodging') {
       featureLayer.eachLayer(function(layer) {
-        var content = '<h2>' + args.data.name + '<\/h2>'
+        var content = '<h2>' + args.data.name + '<\/h2>';
+        content += '<p>' + makeTime(localize(args.data.date[0],utcOffset)) + ' on ' + easyDate(args.data.date[0]) + ' until ' + makeTime(localize(args.data.date[1],utcOffset)) + ' on ' + easyDate(args.data.date[1]) + '</p>';
         layer.bindPopup(content);
       });
     }
   }
 }
+function localize(time, offset) {
+  time = new Date(time).getTime();
+  time -= (offset*60*60*1000);
+  return new Date(time);
+}
+function easyDate(date) {
+  date = new Date(date);
+  return months[date.getMonth()] + ' ' + date.getDate();
+}
 function getTweets() {
-  $.getJSON("http://kziel.herokuapp.com/kziel?count=10&since_id=10&exclude_replies=false",function(data){
-    for(i=0;i<data.length;i++) {
-      tweet = data[i];
-      tweets[tweet.id_str] = tweet;
-    }
-    $.each(data,function(i,tweet){
-      parseTweet(tweet);
-    });
+  $.ajax({
+    url: 'http://kziel.herokuapp.com/kziel?count=10&since_id=10&exclude_replies=false',
+    type: 'GET',
+    dataType: 'jsonp'
+  });
+}
+function twitterData(data) {
+  for(i=0;i<data.length;i++) {
+    tweet = data[i];
+    tweets[tweet.id_str] = tweet;
+  }
+  $.each(data,function(i,tweet){
+    parseTweet(tweet);
   });
 }
 function parseTweet(tweet) {
@@ -149,7 +177,7 @@ function parseTweet(tweet) {
   timelineTweet(tweet);
 }
 function drawTweet(tweet) {
-  addTweetMarker(tweet)
+  addTweetMarker(tweet);
 }
 function addTweetMarker(data) {
   var featureLayer = L.mapbox.featureLayer({

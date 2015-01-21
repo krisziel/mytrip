@@ -100,12 +100,76 @@ var data = [
   },
   "info": {
     "airline": "SQ",
-    "flight": "25",
+    "flight": "856",
     "date": "1/23/2015",
     "seat": "3A",
     "class": "Suites"
   },
   "id":"sinhkg"
+},
+{
+  "type": "lodging",
+  "coordinates": [
+  22.287873,
+  114.138916
+  ],
+  "name": "Courtyard Hong Kong",
+  "date": [
+  "1/23/2015 7:00",
+  "1/25/2015 5:00"
+  ],
+  "id":"chk"
+},
+{
+  "type": "ferry",
+  "date": [
+    "1/25/2015 5:00",
+    "1/25/2015 6:00",
+  ],
+  "origin": {
+    "coordinates": [
+      22.2893086,
+      114.1527226
+    ],
+    "name": "Hong Kong - Macau Ferry Terminal"
+  },
+  "destination": {
+    "coordinates": [
+    22.1641279,
+    113.5784356
+    ],
+    "name": "Outer Tapia Ferry Terminal"
+  },
+  "id":"hkmft"
+},
+{
+  "type": "lodging",
+  "coordinates": [
+  22.1420284,
+  113.5694877
+  ],
+  "name": "Conrad Cotai Central",
+  "date": [
+    "1/25/2015 6:00",
+    "1/26/2015 2:00"
+  ],
+  "id":"ccc"
+},
+{
+  "type":"ferry",
+  "date":[
+    "1/26/2015 2:00",
+    "1/26/2015 3:00"
+  ],
+  "origin":{
+    "coordinates":[22.1981129,113.5606913],
+    "name":"Outer Macau Ferry Terminal"
+  },
+  "destination":{
+    "coordinates":[22.3176268,113.9442349],
+    "name":"SkyPier at HKIA"
+  },
+  "id":"omft"
 },
 {
   "type": "flight",
@@ -133,52 +197,5 @@ var data = [
     "class": "Global First"
   },
   "id":"hkgsfo"
-},
-{
-  "type": "ferry",
-  "date": "1/25/2015",
-  "origin": {
-    "coordinates": [
-      22.2893086,
-      114.1527226
-    ],
-    "name": "Hong Kong - Macau Ferry Terminal"
-  },
-  "destination": {
-    "coordinates": [
-    22.1641279,
-    113.5784356
-    ],
-    "name": "Outer Tapia Ferry Terminal"
-  },
-  "id":"hkmft"
-},
-{
-  "type": "lodging",
-  "coordinates": [
-  22.1420284,
-  113.5694877
-  ],
-  "name": "Conrad Cotai Central",
-  "date": [
-    "1/25/2015",
-    "1/26/2015"
-  ],
-  "id":"ccc"
-},
-{
-  "type":"ferry",
-  "date":[
-  "1/26/2015"
-  ],
-  "origin":{
-    "coordinates":[22.1981129,113.5606913],
-    "name":"Outer Macau Ferry Terminal"
-  },
-  "destination":{
-    "coordinates":[22.3176268,113.9442349],
-    "name":"SkyPier at HKIA"
-  },
-  "id":"omft"
 }
 ]

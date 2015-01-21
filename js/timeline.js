@@ -1,7 +1,8 @@
 var start = new Date('1/20/2015').getTime();
-var end = new Date('1/26/2015').getTime();
+var end = new Date('1/26/2015 09:00').getTime();
 var mspp = ((end-start)/$(window).width());
 var lastLeft = 9999;
+var utcOffset = 8;
 
 function parseTimeline() {
   selectFlights();
@@ -14,6 +15,33 @@ function parseTimeline() {
     style:'left:' + left + 'px;'
   });
   $('#timeline').append(nowLine);
+}
+function timelineHotel(hotel) {
+
+  var blockStart = localize(hotel.date[0], utcOffset).getTime();
+  var blockEnd = localize(hotel.date[1], utcOffset).getTime();
+  var width = ((blockEnd-blockStart)/mspp);
+  var fromStart = blockStart-start;
+  var left = (fromStart/mspp);
+  var hotelBlock = $('<li>',{
+    id:'hotel' + hotel.id,
+    class:'hotel',
+    style:'left:' + left + 'px;width:' + width + 'px'
+  });
+  $('#timeline').append(hotelBlock);
+}
+function timelineFerry(ferry) {
+  var blockStart = localize(ferry.date[0], utcOffset).getTime();
+  var blockEnd = localize(ferry.date[1], utcOffset).getTime();
+  var width = ((blockEnd-blockStart)/mspp);
+  var fromStart = blockStart-start;
+  var left = (fromStart/mspp);
+  var ferryBlock = $('<li>',{
+    id:'ferry' + ferry.id,
+    class:'ferry',
+    style:'left:' + left + 'px;width:' + width + 'px'
+  });
+  $('#timeline').append(ferryBlock);
 }
 function timelineTweet(tweet) {
   var time = new Date(tweet.created_at).getTime();

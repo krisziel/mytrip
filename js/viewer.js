@@ -4,7 +4,7 @@ $(window).ready(function(){
 
 function createViewer(data) {
   $.each(data.media,function(i,image){
-    console.log(image);
+
   });
 }
 
