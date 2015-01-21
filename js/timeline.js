@@ -82,6 +82,9 @@ function openTweet(id) {
     if((timelineLeft-160) <= 10) {
       var paneLeft = 10;
       var tipLeft = (timelineLeft-167);
+    } else if ((timelineLeft+170) > $(window).width()){
+      var paneLeft = $(window).width()-310;
+      var tipLeft = (timelineLeft-paneLeft-160);
     } else {
       var paneLeft = (timelineLeft-157);
       var tipLeft = 0;

@@ -160,6 +160,9 @@ function openFlight(id) {
   if((timelineLeft-160) <= 10) {
     var paneLeft = 10;
     var tipLeft = (timelineLeft-167);
+  } else if ((timelineLeft+170) > $(window).width()){
+    var paneLeft = $(window).width()-310;
+    var tipLeft = (timelineLeft-paneLeft-160);
   } else {
     var paneLeft = (timelineLeft-157);
     var tipLeft = 0;
@@ -170,6 +173,10 @@ function openFlight(id) {
   arrival += (60*60*1000*airportObject[data.arrivalAirportFsCode].utcOffsetHours);
   departure = new Date(departure);
   arrival = new Date(arrival);
+  var tail = '';
+  if(data.flightEquipment.tailNumber) {
+    tail = ' (' + data.flightEquipment.tailNumber + ')'
+  }
   var pane = '<div class="popup-container" style="left:' + paneLeft + 'px;">';
   pane += '<div class="leaflet-popup-tip-container" style="left:' + tipLeft + 'px;"><div class="leaflet-popup-tip"></div></div>';
   pane += '<div class="popup-body">';
@@ -178,7 +185,7 @@ function openFlight(id) {
   content += '<p>Seat ' + data.vitals.seat + ' (' + data.vitals.class + ')</p>';
   content += '<p>Depart ' + data.departureAirportFsCode + ' on ' + dateTime(departure) + '</p>';
   content += '<p>Arrive ' + data.arrivalAirportFsCode + ' on ' + dateTime(arrival) + '</p>';
-  content += '<p style="font-size: 12px;">' + aircraftObject[parseInt(data.flightEquipment.scheduledEquipmentIataCode)].name + '</p>';
+  content += '<p style="font-size: 12px;">' + aircraftObject[parseInt(data.flightEquipment.scheduledEquipmentIataCode)].name + tail + '</p>';
   pane += content;
   pane += '</div>';
   pane += '</div>';

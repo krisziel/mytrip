@@ -1,7 +1,14 @@
 $(document).ready(function(){
   $('#map').css({height:$(window).height()-25,width:$(window).width()});
+  $('#loadingCover').css({height:$(window).height(),width:$(window).width()});
   drawMap();
   parseTimeline();
+  setTimeout(function(){
+    $('#loadingCover').css({opacity:0});
+    setTimeout(function(){
+      $('#loadingCover').remove();
+    },750);
+  },1750);
 });
 
 var globalMap;
@@ -13,7 +20,8 @@ function drawMap(){
     attributionControl: false,
     infoControl: true
   })
-  .setView([0, 0], 2);
+  .setView([0, 0], 4);
+  map.setMaxBounds([[-90,-180], [90,180]]);
   globalMap = map;
   loadFlights();
   getTweets();
@@ -28,7 +36,7 @@ function loadFlights() {
 	} else if(segment.type == "lodging") {
         drawLodging(segment);
       }
-    },i*1000);
+    },i*100);
   });
 }
 function drawFlight(data) {
@@ -49,14 +57,14 @@ function drawFlight(data) {
         path.style.strokeDashoffset = 0;
       };
     })(newLine._path),0);
-    var totalLength = newLine._path.getTotalLength();
-    newLine._path.classList.add('path-start');
-    newLine._path.style.strokeDashoffset = totalLength;
-    newLine._path.style.strokeDasharray = totalLength;
-    addMarker({data:data.origin,coordinates:data.origin.coordinates,symbol:'airport'});
-    setTimeout(function(){
-      addMarker({data:data.destination,coordinates:data.destination.coordinates,symbol:'airport',markerId:data.id});
-    },1000);
+  var totalLength = newLine._path.getTotalLength();
+  newLine._path.classList.add('path-start');
+  newLine._path.style.strokeDashoffset = 0;
+  newLine._path.style.strokeDasharray = 0;
+  addMarker({data:data,od:'origin',coordinates:data.origin.coordinates,symbol:'airport'});
+  setTimeout(function(){
+    addMarker({data:data,od:'destination',coordinates:data.destination.coordinates,symbol:'airport',markerId:data.id});
+  },10);
 }
 function drawFerry(data) {
   var generator = new arc.GreatCircle(
@@ -85,7 +93,7 @@ function drawFerry(data) {
     setTimeout(function(){
       data.od = "destination"
       addMarker({data:data,marker:data.destination,coordinates:data.destination.coordinates,symbol:'ferry',markerId:data.id});
-    },100);
+    },10);
     timelineFerry(data);
 }
 function drawLodging(data) {
@@ -118,7 +126,14 @@ function addMarker(args) {
   if(args.symbol) {
     if(args.symbol == 'airport') {
       featureLayer.eachLayer(function(layer) {
-        var content = '<h2>' + args.data.name + '<\/h2>';
+        var content = '';
+        if(args.od == 'origin') {
+          content += '<h2>' + args.data.origin.name + '<\/h2>';
+          content += '<p>Flight ' + args.data.info.airline + args.data.info.flight + ' to ' + args.data.destination.code + '</p>';
+        } else {
+          content += '<h2>' + args.data.destination.name + '<\/h2>';
+          content += '<p>Flight ' + args.data.info.airline + args.data.info.flight + ' from ' + args.data.origin.code + '</p>';
+        }
         layer.bindPopup(content);
       });
     } else if (args.symbol == 'ferry') {
@@ -166,6 +181,7 @@ function twitterData(data) {
     parseTweet(tweet);
   });
 }
+var tweetCoords = false;
 function parseTweet(tweet) {
   if(tweet.coordinates) {
     drawTweet(tweet);
@@ -173,6 +189,10 @@ function parseTweet(tweet) {
     tweet.coordinates = centerPolygon(tweet.place.bounding_box.coordinates);
     tweet.coordinates.coordinates = tweet.coordinates;
 	  addTweetMarker(tweet);
+  }
+  if(tweetCoords === false) {
+    globalMap.setView([tweet.coordinates.coordinates[1],tweet.coordinates.coordinates[0]], 10, {animation: true});
+    tweetCoords = true;
   }
   timelineTweet(tweet);
 }
