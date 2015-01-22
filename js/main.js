@@ -195,7 +195,7 @@ function parseTweet(tweet) {
     tweet.coordinates.coordinates = tweet.coordinates;
 	  addTweetMarker(tweet);
   }
-  if(tweetCoords === false) {
+  if((tweetCoords === false)&&(tweet.coordinates)&&(tweet.coordinates.coordinates)) {
     globalMap.setView([tweet.coordinates.coordinates[1],tweet.coordinates.coordinates[0]], 10, {animation: true});
     tweetCoords = true;
   }
